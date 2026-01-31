@@ -10,5 +10,99 @@
 <body>
   <app-root></app-root>
    <!-- <apprefined-root></apprefined-root> -->
+
+   <script>
+
+  let resizer ='';
+  let left = '';
+  let isDragging = false;
+  minHeight = 900; prevHeight = 0;
+    parentURL = 'https://storenotify.in';
+     // parentURL = 'http://localhost:4200';
+
+document.addEventListener('DOMContentLoaded', function () {
+    resizer = document.getElementById('resizer');
+   left = document.getElementById('left');
+  isDragging = false;
+ /* window.addEventListener('message', function (event) {
+    console.log('Received message:', event.data);
+  });*/
+   // Listen for parent message
+  window.addEventListener('message', (event) => {
+    console.log('Message from parent ' );
+    if (event.origin !== parentURL) return;
+    console.log('Received message from parent:', event.data);
+    console.log(' event.data.payload :', event.data.payload);
+    let pPayLoad =  event.data.payload;
+     console.log(' parent send Heigth offset :',pPayLoad.offHeight );
+      console.log(' parent send width offset :',pPayLoad.offWidth );
+     document.body.scrollHeight =pPayLoad.offHeight;
+     document.body.scrollWidth =pPayLoad.offWidth;
+     prevHeight = document.body.style.minHeight;
+     prevWidth = document.body.style.minWidth;
+     let height = document.body.scrollHeight;
+      let width = document.body.scrollWidth;
+     document.body.style.minHeight = height + 'px';
+     document.body.style.minWidth = width + 'px';
+     if(height >=  (prevHeight+100 ) || height <=  (prevHeight-100 )){
+      console.log("height not changed"  ); }else  {
+     // event.source.postMessage({ iframeHeight: minHeight }, '*');
+          }
+        if(width >=  (prevWidth+100 ) || height <=  (prevWidth-100 )){
+      console.log("prevWidth not changed"  ); }else  {
+     // event.source.postMessage({ iframeHeight: minHeight }, '*');
+          }
+    // Reply back to parent
+    //event.source.postMessage({ message: 'HELLO_FROM_IFRAME' }, event.origin);
+  });
+
+  resizer.addEventListener('mousedown', function (e) {
+    isDragging = true;
+    document.body.style.cursor = 'ew-resize';
+  });
+
+  document.addEventListener('mousemove', function (e) {
+    if (!isDragging) return;
+    const containerOffsetLeft = container.offsetLeft;
+    const pointerRelativeXPos = e.clientX - containerOffsetLeft;
+    const containerWidth = container.offsetWidth;
+
+    const leftWidth = (pointerRelativeXPos / containerWidth) * 100;
+    left.style.flex = `0 0 ${leftWidth}%`;
+  });
+
+  document.addEventListener('mouseup', function () {
+    isDragging = false;
+    document.body.style.cursor = 'default';
+  });
+
+
+
+
+});
+
+
+
+
+function sendHeightToParent() {
+			    let height = document.body.scrollHeight;
+          if(height < minHeight) height = minHeight;
+          console.log("document scroll height: ", height);
+          console.log("document minHeight: ", document.body.style.minHeight);
+          console.log("document height: ",  document.height);
+          document.body.style.minHeight = height + 'px';
+          console.log("document minHeight: ", document.body.style.minHeight);
+          if(height >=  (prevHeight+100 ) || height <=  (prevHeight-100 )){ console.log("height not changed"  ); }else  {
+             parent.postMessage({ iframeHeight: height }, '*');
+          }
+
+  			}
+
+		  window.addEventListener('load', sendHeightToParent);
+		 // window.addEventListener('resize', sendHeightToParent);
+
+
+
+</script>
 </body>
 </html>
